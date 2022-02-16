@@ -22,20 +22,7 @@ class OldProduct
      */
     public function decrementCounter(): void
     {
-        if ($this->price != null && $this->price->getSign() > 0) {
-            if
-            ($this->counter === null) {
-                throw new \Exception("null counter");
-            }
-
-            $this->counter = $this->counter - 1;
-            if ($this->counter < 0) {
-                throw new \Exception("Negative counter");
-            }
-        } else {
-            throw new \Exception("Invalid price");
-
-        }
+        $this->modifyCounter($this->counter - 1);
     }
 
     public function __construct(?BigDecimal $price, ?string $desc, ?string $longDesc, ?int $counter)
@@ -52,20 +39,7 @@ class OldProduct
      */
     public function incrementCounter(): void
     {
-        if ($this->price != null && $this->price->getSign() > 0) {
-            if ($this->counter === null) {
-                throw new \Exception("null counter");
-            }
-
-            if ($this->counter + 1 < 0) {
-                throw new \Exception("Negative counter");
-            }
-            $this->counter = $this->counter + 1;
-
-        } else {
-            throw new \Exception("Invalid price");
-
-        }
+        $this->modifyCounter($this->counter + 1);
     }
 
     public function changePriceTo(?BigDecimal $newPrice): void
@@ -111,5 +85,23 @@ class OldProduct
         return $this->desc . " *** " . $this->longDesc;
     }
 
+    /**
+     * @throws \Exception
+     */
+    private function modifyCounter(int $newValue): void
+    {
+        if ($this->price == null || $this->price->getSign() <= 0) {
+            throw new \Exception("Invalid price");
+        }
 
+        if ($this->counter === null) {
+            throw new \Exception("null counter");
+        }
+
+        if ($newValue < 0) {
+            throw new \Exception("Negative counter");
+        }
+
+        $this->counter = $newValue;
+    }
 }

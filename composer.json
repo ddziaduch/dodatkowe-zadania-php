@@ -4,8 +4,16 @@
             "": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "LegacyFighter\\Dietary\\Tests\\": "tests/"
+        }
+    },
     "require": {
         "ramsey/uuid": "^4.1",
         "brick/math": "^0.9.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
     }
 }

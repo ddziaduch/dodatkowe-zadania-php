@@ -32,6 +32,17 @@ final class TaxRuleServiceTest extends TestCase
         self::assertSame(10, $taxConfig->getMaxRulesCount());
     }
 
+    public function testCanCreateTaxConfigWithRuleAndCustomMaxRuleCount(): void
+    {
+        $taxRule = new TaxRule();
+        $taxConfig = $this->taxRuleService->createTaxConfigWithRuleAndMaxCount(self::COUNTRY_CODE, 15, $taxRule);
+        self::assertSame(self::COUNTRY_CODE, $taxConfig->getCountryCode());
+        $rules = $taxConfig->getTaxRules()->toArray();
+        self::assertEquals([$taxRule], $rules);
+        self::assertSame(1, $taxConfig->getCurrentRulesCount());
+        self::assertSame(15, $taxConfig->getMaxRulesCount());
+    }
+
     public function testCanAddLinearTaxRuleToCountryThatHaveNoRulesYet(): void
     {
         $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 3, 4, 'efg');
@@ -47,7 +58,7 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCanAddLinearTaxRuleToCountry(): void
     {
-        $this->aTaxConfigWithRules(1);
+        $this->aTaxConfigWithLinearRules(1);
 
         $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 1, 2, 'abc');
 
@@ -62,27 +73,24 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCannotAddLinearTaxRuleToCountryWithZeroAsFactorA(): void
     {
-        $this->aTaxConfigWithRules(1);
+        $this->aTaxConfigWithLinearRules(1);
 
         $this->expectExceptionObject(new \Exception('Invalid aFactor'));
         $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 0, 2, 'abc');
     }
 
-    public function testCanCreateTaxConfigWith10MaxRulesCountAsByDefault(): void
+    public function testCannotAddLinearRuleWhenCountryMaxRules(): void
     {
-        $this->aTaxConfigWithRules(10);
-
+        $this->aTaxConfigWithLinearRules(10);
         $this->expectExceptionObject(new \Exception('Too many rules'));
         $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 1, 2, 'abc');
     }
 
-    public function testCanCreateTaxConfigWithCustomMaxRuleCount(): void
+    public function testCannotAddSquareRuleWhenCountryMaxRules(): void
     {
-        $this->taxRuleService->createTaxConfigWithRuleAndMaxCount(self::COUNTRY_CODE, 15, new TaxRule());
-        $this->aTaxConfigWithRules(14);
-
+        $this->aTaxConfigWithLinearRules(10);
         $this->expectExceptionObject(new \Exception('Too many rules'));
-        $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 1, 1, 'abc');
+        $this->taxRuleService->addTaxRuleToCountry2(self::COUNTRY_CODE, 1, 1, 1, 'abc');
     }
 
     public function testCanAddSquareTaxRuleToCountryThatHaveNoRulesYet(): void
@@ -110,7 +118,7 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCanAddSquareTaxRuleToCountry(): void
     {
-        $this->aTaxConfigWithRules(1);
+        $this->aTaxConfigWithLinearRules(1);
 
         $this->taxRuleService->addTaxRuleToCountry2(self::COUNTRY_CODE, 8, 9, 10, 'ccc');
 
@@ -126,7 +134,7 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCanDeleteRuleIfCountryHasMoreThanOneRule(): void
     {
-        $this->aTaxConfigWithRules(2);
+        $this->aTaxConfigWithLinearRules(2);
 
         $rule = $this->getLastRule();
         $taxConfig = $this->getTaxConfig();
@@ -136,7 +144,7 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCannotDeleteLastRule(): void
     {
-        $this->aTaxConfigWithRules(1);
+        $this->aTaxConfigWithLinearRules(1);
 
         $rule = $this->getLastRule();
         $taxConfig = $this->getTaxConfig();
@@ -155,7 +163,7 @@ final class TaxRuleServiceTest extends TestCase
         $this->taxRuleService = new TaxRuleService($taxRuleRepository, $taxConfigRepository, $orderRepository);
     }
 
-    private function aTaxConfigWithRules(int $numberOfRules): void
+    private function aTaxConfigWithLinearRules(int $numberOfRules): void
     {
         for ($i = 1; $i <= $numberOfRules; $i++) {
             $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, $i, $i, (string) $i);

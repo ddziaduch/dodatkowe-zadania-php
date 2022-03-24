@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace LegacyFighter\Dietary\Tests;
 
-use LegacyFighter\Dietary\Repository\InMemoryOrderRepository;
 use LegacyFighter\Dietary\Repository\InMemoryTaxConfigRepository;
-use LegacyFighter\Dietary\Repository\InMemoryTaxRuleRepository;
 use LegacyFighter\Dietary\TaxConfig;
 use LegacyFighter\Dietary\TaxRule;
 use LegacyFighter\Dietary\TaxRuleService;
@@ -156,11 +154,7 @@ final class TaxRuleServiceTest extends TestCase
     {
         parent::setUp();
 
-        $taxConfigRepository = new InMemoryTaxConfigRepository();
-        $orderRepository = new InMemoryOrderRepository();
-        $taxRuleRepository = new InMemoryTaxRuleRepository($taxConfigRepository);
-
-        $this->taxRuleService = new TaxRuleService($taxRuleRepository, $taxConfigRepository, $orderRepository);
+        $this->taxRuleService = new TaxRuleService(new InMemoryTaxConfigRepository());
     }
 
     private function aTaxConfigWithLinearRules(int $numberOfRules): void

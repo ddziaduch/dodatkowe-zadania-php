@@ -7,31 +7,18 @@ use Munus\Collection\GenericList;
 class TaxRuleService
 {
     /**
-     * @var TaxRuleRepository
-     */
-    private $taxRuleRepository;
-
-    /**
      * @var TaxConfigRepository
      */
     private $taxConfigRepository;
 
     /**
-     * @var OrderRepository
-     */
-    private $orderRepository;
-
-    /**
      * TaxRuleService constructor.
-     * @param TaxRuleRepository $taxRuleRepository
+     *
      * @param TaxConfigRepository $taxConfigRepository
-     * @param OrderRepository $orderRepository
      */
-    public function __construct(TaxRuleRepository $taxRuleRepository, TaxConfigRepository $taxConfigRepository, OrderRepository $orderRepository)
+    public function __construct(TaxConfigRepository $taxConfigRepository)
     {
-        $this->taxRuleRepository = $taxRuleRepository;
         $this->taxConfigRepository = $taxConfigRepository;
-        $this->orderRepository = $orderRepository;
     }
 
     public function addTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, string $taxCode)
@@ -130,20 +117,9 @@ class TaxRuleService
      * @throws \Exception
      */
     public function deleteRule(int $taxRuleId, int $configId) {
-        $taxRule = $this->taxRuleRepository->getOne($taxRuleId);
         $taxConfig = $this->taxConfigRepository->getOne($configId);
 
-        if ($taxConfig->getTaxRules()->contains($taxRule)) {
-            if ($taxConfig->getTaxRules()->length() == 1) {
-                throw new \Exception("Last rule in country config");
-            }
-
-            $this->taxRuleRepository->delete($taxRule);
-            $taxConfig->setTaxRules($taxConfig->getTaxRules()->filter(function (TaxRule $taxRule) use ($taxRuleId) {
-                return $taxRule->getId() != $taxRuleId;
-            }));
-            $taxConfig->setLastModifiedDate(new \DateTime());
-        }
+        $taxConfig->deleteRule($taxRuleId);
 
         $this->taxConfigRepository->save($taxConfig);
     }

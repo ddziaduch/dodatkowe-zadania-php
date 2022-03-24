@@ -21,6 +21,17 @@ final class TaxRuleServiceTest extends TestCase
      */
     private $taxRuleService;
 
+    public function testCanCreateTaxConfigWithRule(): void
+    {
+        $taxRule = new TaxRule();
+        $taxConfig = $this->taxRuleService->createTaxConfigWithRule(self::COUNTRY_CODE, $taxRule);
+        self::assertSame(self::COUNTRY_CODE, $taxConfig->getCountryCode());
+        $rules = $taxConfig->getTaxRules()->toArray();
+        self::assertEquals([$taxRule], $rules);
+        self::assertSame(1, $taxConfig->getCurrentRulesCount());
+        self::assertSame(10, $taxConfig->getMaxRulesCount());
+    }
+
     public function testCanAddLinearTaxRuleToCountryThatHaveNoRulesYet(): void
     {
         $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 3, 4, 'efg');

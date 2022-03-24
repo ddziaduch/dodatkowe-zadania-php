@@ -49,12 +49,30 @@ class TaxConfig
     /**
      * TaxConfig constructor.
      */
-    public function __construct()
+    private function __construct(string $countryCode, TaxRule $taxRule, int $maxRulesCount = 10)
     {
         $this->id = random_int(0, PHP_INT_MAX); // SHORTCUT
-        $this->taxRules = GenericList::empty();
+        $this->taxRules = GenericList::of($taxRule);
+        $this->countryCode = $countryCode;
+        $this->currentRulesCount = 1;
+        $this->maxRulesCount = $maxRulesCount;
+        $this->lastModifiedDate = new \DateTime();
     }
 
+    public static function withDefaultMaxRuleCount(
+        string $countryCode,
+        TaxRule $taxRule
+    ): self {
+        return new self($countryCode, $taxRule);
+    }
+
+    public static function withCustomMaxRulesCount(
+        string $countryCode,
+        int $maxRulesCount,
+        TaxRule $taxRule
+    ): self {
+        return new self($countryCode, $taxRule, $maxRulesCount);
+    }
 
     /**
      * @return string
@@ -142,14 +160,6 @@ class TaxConfig
     public function getMaxRulesCount(): int
     {
         return $this->maxRulesCount;
-    }
-
-    /**
-     * @param int $maxRulesCount
-     */
-    public function setMaxRulesCount(int $maxRulesCount): void
-    {
-        $this->maxRulesCount = $maxRulesCount;
     }
 
     /**

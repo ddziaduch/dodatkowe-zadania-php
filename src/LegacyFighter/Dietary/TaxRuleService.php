@@ -23,9 +23,8 @@ class TaxRuleService
 
     public function addTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, string $taxCode)
     {
-        if ($countryCode === null || $countryCode == "" || strlen($countryCode) == 1) {
-            throw new \Exception("Invalid country code");
-        }
+        $countryCodeValueObject = new CountryCode($countryCode);
+
         if ($aFactor == 0) {
             throw new \Exception("Invalid aFactor");
         }
@@ -37,10 +36,10 @@ class TaxRuleService
         $taxRule->setLinear(true);
         $year = (int)date('Y');
         $taxRule->setTaxCode("A. 899. " . $year . $taxCode);
-        $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCode);
+        $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
 
         if ($taxConfig == null) {
-            $this->createTaxConfigWithRule($countryCode, $taxRule);
+            $this->createTaxConfigWithRule((string) $countryCodeValueObject, $taxRule);
 
             return;
         }
@@ -58,11 +57,9 @@ class TaxRuleService
      */
     public function createTaxConfigWithRule(string $countryCode, TaxRule $taxRule): TaxConfig
     {
-        if ($countryCode == null || $countryCode == "" || strlen($countryCode) == 1) {
-            throw new \Exception("Invalid country code");
-        }
+        $countryCodeValueObject = new CountryCode($countryCode);
 
-        $taxConfig = TaxConfig::withDefaultMaxRuleCount($countryCode, $taxRule);
+        $taxConfig = TaxConfig::withDefaultMaxRuleCount($countryCodeValueObject, $taxRule);
 
         $this->taxConfigRepository->save($taxConfig);
 
@@ -71,11 +68,9 @@ class TaxRuleService
 
     public function createTaxConfigWithRuleAndMaxCount(string $countryCode, int $maxRulesCount, TaxRule $taxRule): TaxConfig
     {
-        if ($countryCode == null || $countryCode == "" || strlen($countryCode) == 1) {
-            throw new \Exception("Invalid country code");
-        }
+        $countryCodeValueObject = new CountryCode($countryCode);
 
-        $taxConfig = TaxConfig::withCustomMaxRulesCount($countryCode, $maxRulesCount, $taxRule);
+        $taxConfig = TaxConfig::withCustomMaxRulesCount($countryCodeValueObject, $maxRulesCount, $taxRule);
 
         $this->taxConfigRepository->save($taxConfig);
 
@@ -84,12 +79,10 @@ class TaxRuleService
 
     public function addTaxRuleToCountry2(string $countryCode, int $aFactor, int $bFactor, int $cFactor, string $taxCode): void
     {
+        $countryCodeValueObject = new CountryCode($countryCode);
+
         if ($aFactor == 0) {
             throw new \Exception("Invalid aFactor");
-        }
-
-        if ($countryCode == null || $countryCode == "" || strlen($countryCode) == 1) {
-            throw new \Exception("Invalid country code");
         }
 
         $taxRule = new TaxRule();
@@ -100,10 +93,10 @@ class TaxRuleService
         $year = (int)date('Y');
         $taxRule->setTaxCode("A. 899. " . $year . $taxCode);
 
-        $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCode);
+        $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
 
         if ($taxConfig == null) {
-            $taxConfig = $this->createTaxConfigWithRule($countryCode, $taxRule);
+            $taxConfig = $this->createTaxConfigWithRule((string) $countryCodeValueObject, $taxRule);
         }
 
         $taxConfig->addRule($taxRule);
@@ -130,7 +123,7 @@ class TaxRuleService
      */
     public function findRules(string $countryCode): GenericList
     {
-        return $this->taxConfigRepository->findByCountryCode($countryCode)->getTaxRules();
+        return $this->taxConfigRepository->findByCountryCode(new CountryCode($countryCode))->getTaxRules();
     }
 
     /**
@@ -139,7 +132,7 @@ class TaxRuleService
      */
     public function rulesCount(string $countryCode): int
     {
-        return $this->taxConfigRepository->findByCountryCode($countryCode)->getCurrentRulesCount();
+        return $this->taxConfigRepository->findByCountryCode(new CountryCode($countryCode))->getCurrentRulesCount();
     }
 
     /**

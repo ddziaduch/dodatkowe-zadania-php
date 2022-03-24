@@ -12,7 +12,7 @@ class TaxConfig
     private $id;
 
     /**
-     * @var string
+     * @var CountryCode
      */
     private $countryCode;
 
@@ -31,7 +31,7 @@ class TaxConfig
      */
     private $taxRules;
 
-    private function __construct(string $countryCode, TaxRule $taxRule, int $maxRulesCount = 10)
+    private function __construct(CountryCode $countryCode, TaxRule $taxRule, int $maxRulesCount = 10)
     {
         $this->id = random_int(0, PHP_INT_MAX); // SHORTCUT
         $this->taxRules = GenericList::of($taxRule);
@@ -41,14 +41,14 @@ class TaxConfig
     }
 
     public static function withDefaultMaxRuleCount(
-        string $countryCode,
+        CountryCode $countryCode,
         TaxRule $taxRule
     ): self {
         return new self($countryCode, $taxRule);
     }
 
     public static function withCustomMaxRulesCount(
-        string $countryCode,
+        CountryCode $countryCode,
         int $maxRulesCount,
         TaxRule $taxRule
     ): self {
@@ -57,7 +57,7 @@ class TaxConfig
 
     public function getCountryCode(): string
     {
-        return $this->countryCode;
+        return (string) $this->countryCode;
     }
 
     public function getLastModifiedDate(): \DateTime

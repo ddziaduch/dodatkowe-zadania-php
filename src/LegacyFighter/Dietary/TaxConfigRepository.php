@@ -4,11 +4,7 @@ namespace LegacyFighter\Dietary;
 
 interface TaxConfigRepository
 {
-    /**
-     * @param string $countryCode
-     * @return TaxConfig
-     */
-    public function findByCountryCode(string $countryCode): ?TaxConfig;
+    public function findByCountryCode(CountryCode $countryCode): ?TaxConfig;
 
     /**
      * @return array

@@ -2,27 +2,21 @@
 
 namespace LegacyFighter\Dietary\Repository;
 
+use LegacyFighter\Dietary\CountryCode;
 use LegacyFighter\Dietary\TaxConfig;
 use LegacyFighter\Dietary\TaxConfigRepository;
 
 class InMemoryTaxConfigRepository implements TaxConfigRepository
 {
     /**
-     * @var TagConfig[]
+     * @var TaxConfig[]
      */
     private $taxConfigs = [];
 
-    /**
-     * @param string $countryCode
-     * @return TaxConfig|null
-     */
-    public function findByCountryCode(string $countryCode): ?TaxConfig
+    public function findByCountryCode(CountryCode $countryCode): ?TaxConfig
     {
-        /**
-         * @var $taxConfig TaxConfig
-         */
         foreach ($this->taxConfigs as $taxConfig) {
-            if ($taxConfig->getCountryCode() == $countryCode) {
+            if ($countryCode->isEqual($taxConfig->getCountryCode())) {
                 return $taxConfig;
             }
         }

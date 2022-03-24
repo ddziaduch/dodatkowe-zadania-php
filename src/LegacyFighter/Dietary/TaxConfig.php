@@ -24,11 +24,6 @@ class TaxConfig
     /**
      * @var int
      */
-    private $currentRulesCount;
-
-    /**
-     * @var int
-     */
     private $maxRulesCount;
 
     /**
@@ -41,7 +36,6 @@ class TaxConfig
         $this->id = random_int(0, PHP_INT_MAX); // SHORTCUT
         $this->taxRules = GenericList::of($taxRule);
         $this->countryCode = $countryCode;
-        $this->currentRulesCount = 1;
         $this->maxRulesCount = $maxRulesCount;
         $this->lastModifiedDate = new \DateTime();
     }
@@ -73,7 +67,7 @@ class TaxConfig
 
     public function getCurrentRulesCount(): int
     {
-        return $this->currentRulesCount;
+        return $this->taxRules->length();
     }
 
     public function getMaxRulesCount(): int
@@ -104,7 +98,6 @@ class TaxConfig
         }
 
         $this->taxRules = $this->taxRules->append($taxRule);
-        $this->currentRulesCount = $this->currentRulesCount + 1;
         $this->lastModifiedDate = new \DateTime();
     }
 

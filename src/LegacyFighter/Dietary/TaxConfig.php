@@ -185,4 +185,18 @@ class TaxConfig
     {
         return $this->id;
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function addRule(TaxRule $taxRule)
+    {
+        if ($this->maxRulesCount <= $this->taxRules->length()) {
+            throw new \Exception("Too many rules");
+        }
+
+        $this->taxRules = $this->taxRules->append($taxRule);
+        $this->currentRulesCount = $this->currentRulesCount + 1;
+        $this->lastModifiedDate = new \DateTime();
+    }
 }

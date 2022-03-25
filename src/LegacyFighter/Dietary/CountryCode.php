@@ -31,8 +31,8 @@ class CountryCode
         return $this->code;
     }
 
-    public function isEqual(string $other): bool
+    public function isEqual(CountryCode $other): bool
     {
-        return $this->code === $other;
+        return $this->code === $other->code;
     }
 }

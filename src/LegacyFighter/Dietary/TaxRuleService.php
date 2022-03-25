@@ -25,7 +25,7 @@ class TaxRuleService
     /**
      * @throws \Exception
      */
-    public function addLinearTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, string $taxCode)
+    public function addLinearTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, string $taxCode): void
     {
         $this->addTaxRuleToCountry(
             new CountryCode($countryCode),
@@ -36,25 +36,24 @@ class TaxRuleService
     /**
      * @throws \Exception
      */
-    public function createTaxConfigWithRule(string $countryCode, TaxRule $taxRule): TaxConfig
+    public function createTaxConfigWithRule(string $countryCode, TaxRule $taxRule): TaxConfigDto
     {
-        $taxConfig = TaxConfig::withDefaultMaxRuleCount(new CountryCode($countryCode), $taxRule);
+        $config = TaxConfig::withDefaultMaxRuleCount(new CountryCode($countryCode), $taxRule);
+        $this->taxConfigRepository->save($config);
 
-        $this->taxConfigRepository->save($taxConfig);
-
-        return $taxConfig;
+        return TaxConfigDto::fromArray($config->toArray());
     }
 
     /**
      * @throws \Exception
      */
-    public function createTaxConfigWithRuleAndMaxCount(string $countryCode, int $maxRulesCount, TaxRule $taxRule): TaxConfig
+    public function createTaxConfigWithRuleAndMaxCount(string $countryCode, int $maxRulesCount, TaxRule $taxRule): TaxConfigDto
     {
-        $taxConfig = TaxConfig::withCustomMaxRulesCount(new CountryCode($countryCode), $maxRulesCount, $taxRule);
+        $config = TaxConfig::withCustomMaxRulesCount(new CountryCode($countryCode), $maxRulesCount, $taxRule);
 
-        $this->taxConfigRepository->save($taxConfig);
+        $this->taxConfigRepository->save($config);
 
-        return $taxConfig;
+        return TaxConfigDto::fromArray($config->toArray());
     }
 
     /**
@@ -96,11 +95,16 @@ class TaxRuleService
     }
 
     /**
-     * @return TaxConfig[]
+     * @return TaxConfigDto[]
      */
     public function findAllConfigs(): array
     {
-        return $this->taxConfigRepository->findAll();
+        return array_map(
+            function (TaxConfig $config) {
+                return TaxConfigDto::fromArray($config->toArray());
+            },
+            $this->taxConfigRepository->findAll()
+        );
     }
 
     /**
@@ -111,10 +115,11 @@ class TaxRuleService
         $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCode);
 
         if ($taxConfig === null) {
-            $this->createTaxConfigWithRule((string) $countryCode, $taxRule);
+            $taxConfig = TaxConfig::withDefaultMaxRuleCount($countryCode, $taxRule);
         } else {
             $taxConfig->addRule($taxRule);
-            $this->taxConfigRepository->save($taxConfig);
         }
+
+        $this->taxConfigRepository->save($taxConfig);
     }
 }

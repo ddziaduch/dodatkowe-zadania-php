@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace LegacyFighter\Dietary\Tests;
 
 use LegacyFighter\Dietary\Repository\InMemoryTaxConfigRepository;
-use LegacyFighter\Dietary\TaxConfig;
+use LegacyFighter\Dietary\TaxConfigDto;
 use LegacyFighter\Dietary\TaxRule;
 use LegacyFighter\Dietary\TaxRuleService;
 use PHPUnit\Framework\TestCase;
@@ -22,23 +22,21 @@ final class TaxRuleServiceTest extends TestCase
     public function testCanCreateTaxConfigWithRule(): void
     {
         $taxRule = TaxRule::linear(1, 1, 2022, 'abc');
-        $taxConfig = $this->taxRuleService->createTaxConfigWithRule(self::COUNTRY_CODE, $taxRule);
-        self::assertSame(self::COUNTRY_CODE, $taxConfig->getCountryCode());
-        $rules = $taxConfig->getTaxRules()->toArray();
+        $dto = $this->taxRuleService->createTaxConfigWithRule(self::COUNTRY_CODE, $taxRule);
+        self::assertSame(self::COUNTRY_CODE, $dto->countryCode);
+        $rules = $dto->taxRules;
         self::assertEquals([$taxRule], $rules);
-        self::assertSame(1, $taxConfig->getCurrentRulesCount());
-        self::assertSame(10, $taxConfig->getMaxRulesCount());
+        self::assertSame(10, $dto->maxRulesCount);
     }
 
     public function testCanCreateTaxConfigWithRuleAndCustomMaxRuleCount(): void
     {
         $taxRule = TaxRule::linear(1, 1, 2022, 'abc');
-        $taxConfig = $this->taxRuleService->createTaxConfigWithRuleAndMaxCount(self::COUNTRY_CODE, 15, $taxRule);
-        self::assertSame(self::COUNTRY_CODE, $taxConfig->getCountryCode());
-        $rules = $taxConfig->getTaxRules()->toArray();
+        $dto = $this->taxRuleService->createTaxConfigWithRuleAndMaxCount(self::COUNTRY_CODE, 15, $taxRule);
+        self::assertSame(self::COUNTRY_CODE, $dto->countryCode);
+        $rules = $dto->taxRules;
         self::assertEquals([$taxRule], $rules);
-        self::assertSame(1, $taxConfig->getCurrentRulesCount());
-        self::assertSame(15, $taxConfig->getMaxRulesCount());
+        self::assertSame(15, $dto->maxRulesCount);
     }
 
     public function testCanAddLinearTaxRuleToCountryThatHaveNoRulesYet(): void
@@ -128,7 +126,7 @@ final class TaxRuleServiceTest extends TestCase
 
         $rule = $this->getLastRule();
         $taxConfig = $this->getTaxConfig();
-        $this->taxRuleService->deleteRule($rule->getId(), $taxConfig->getId());
+        $this->taxRuleService->deleteRule($rule->getId(), $taxConfig->id);
         self::assertCount(1, $this->getRules());
     }
 
@@ -139,7 +137,7 @@ final class TaxRuleServiceTest extends TestCase
         $rule = $this->getLastRule();
         $taxConfig = $this->getTaxConfig();
         $this->expectExceptionObject(new \Exception('Last rule in country config'));
-        $this->taxRuleService->deleteRule($rule->getId(), $taxConfig->getId());
+        $this->taxRuleService->deleteRule($rule->getId(), $taxConfig->id);
     }
 
     protected function setUp(): void
@@ -204,7 +202,7 @@ final class TaxRuleServiceTest extends TestCase
         self::assertSame($expectedTaxCode, $rule->getTaxCode());
     }
 
-    private function getTaxConfig(): TaxConfig
+    private function getTaxConfig(): TaxConfigDto
     {
         $configs = $this->taxRuleService->findAllConfigs();
 

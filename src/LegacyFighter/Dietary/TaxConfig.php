@@ -55,24 +55,14 @@ class TaxConfig
         return new self($countryCode, $taxRule, $maxRulesCount);
     }
 
-    public function getCountryCode(): string
+    public function getCountryCode(): CountryCode
     {
-        return (string) $this->countryCode;
-    }
-
-    public function getLastModifiedDate(): \DateTime
-    {
-        return $this->lastModifiedDate;
+        return $this->countryCode;
     }
 
     public function getCurrentRulesCount(): int
     {
         return $this->taxRules->length();
-    }
-
-    public function getMaxRulesCount(): int
-    {
-        return $this->maxRulesCount;
     }
 
     /**
@@ -116,5 +106,16 @@ class TaxConfig
             }
         );
         $this->lastModifiedDate = new \DateTime();
+    }
+
+    public function toArray(): array
+    {
+        return [
+        'id' => $this->id,
+        'countryCode' => (string) $this->countryCode,
+        'maxRulesCount' => $this->maxRulesCount,
+        'lastModifiedDate' => clone $this->lastModifiedDate,
+        'taxRules' => $this->taxRules->toArray(),
+        ];
     }
 }

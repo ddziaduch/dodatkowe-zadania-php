@@ -16,17 +16,15 @@ class TaxRuleService
      */
     private $year;
 
-    /**
-     * TaxRuleService constructor.
-     *
-     * @param TaxConfigRepository $taxConfigRepository
-     */
     public function __construct(TaxConfigRepository $taxConfigRepository, int $year)
     {
         $this->taxConfigRepository = $taxConfigRepository;
         $this->year = $year;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function addTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, string $taxCode)
     {
         $countryCodeValueObject = new CountryCode($countryCode);
@@ -46,9 +44,6 @@ class TaxRuleService
     }
 
     /**
-     * @param string $countryCode
-     * @param TaxRule $taxRule
-     * @return TaxConfig
      * @throws \Exception
      */
     public function createTaxConfigWithRule(string $countryCode, TaxRule $taxRule): TaxConfig
@@ -62,6 +57,9 @@ class TaxRuleService
         return $taxConfig;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function createTaxConfigWithRuleAndMaxCount(string $countryCode, int $maxRulesCount, TaxRule $taxRule): TaxConfig
     {
         $countryCodeValueObject = new CountryCode($countryCode);
@@ -73,13 +71,12 @@ class TaxRuleService
         return $taxConfig;
     }
 
+    /**
+     * @throws \Exception
+     */
     public function addTaxRuleToCountry2(string $countryCode, int $aFactor, int $bFactor, int $cFactor, string $taxCode): void
     {
         $countryCodeValueObject = new CountryCode($countryCode);
-
-        if ($aFactor == 0) {
-            throw new \Exception("Invalid aFactor");
-        }
 
         $taxRule = TaxRule::square($aFactor, $bFactor, $cFactor, $this->year, $taxCode);
         $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
@@ -92,8 +89,6 @@ class TaxRuleService
     }
 
     /**
-     * @param int $taxRuleId
-     * @param int $configId
      * @throws \Exception
      */
     public function deleteRule(int $taxRuleId, int $configId) {
@@ -105,8 +100,7 @@ class TaxRuleService
     }
 
     /**
-     * @param string $countryCode
-     * @return GenericList
+     * @return GenericList<TaxRule>
      */
     public function findRules(string $countryCode): GenericList
     {
@@ -114,7 +108,6 @@ class TaxRuleService
     }
 
     /**
-     * @param string $countryCode
      * @return int
      */
     public function rulesCount(string $countryCode): int
@@ -123,7 +116,7 @@ class TaxRuleService
     }
 
     /**
-     * @return array
+     * @return TaxConfig[]
      */
     public function findAllConfigs(): array
     {

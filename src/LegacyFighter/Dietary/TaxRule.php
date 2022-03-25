@@ -70,8 +70,15 @@ class TaxRule
         return $self;
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function square(int $aFactor, int $bFactor, int $cFactor, int $year, string $taxCode): self
     {
+        if ($aFactor == 0) {
+            throw new \Exception("Invalid aFactor");
+        }
+
         $self = new self($year, $taxCode);
 
         $self->aSquareFactor = $aFactor;

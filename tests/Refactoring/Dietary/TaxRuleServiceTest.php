@@ -43,7 +43,7 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCanAddLinearTaxRuleToCountryThatHaveNoRulesYet(): void
     {
-        $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 3, 4, 'efg');
+        $this->taxRuleService->addLinearTaxRuleToCountry(self::COUNTRY_CODE, 3, 4, 'efg');
 
         $this->assertRulesCount(1);
         $this->assertRuleIsLinear(
@@ -58,7 +58,7 @@ final class TaxRuleServiceTest extends TestCase
     {
         $this->aTaxConfigWithLinearRules(1);
 
-        $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 1, 2, 'abc');
+        $this->taxRuleService->addLinearTaxRuleToCountry(self::COUNTRY_CODE, 1, 2, 'abc');
 
         $this->assertRulesCount(2);
         $this->assertRuleIsLinear(
@@ -74,26 +74,26 @@ final class TaxRuleServiceTest extends TestCase
         $this->aTaxConfigWithLinearRules(1);
 
         $this->expectExceptionObject(new \Exception('Invalid aFactor'));
-        $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 0, 2, 'abc');
+        $this->taxRuleService->addLinearTaxRuleToCountry(self::COUNTRY_CODE, 0, 2, 'abc');
     }
 
     public function testCannotAddLinearRuleWhenCountryMaxRules(): void
     {
         $this->aTaxConfigWithLinearRules(10);
         $this->expectExceptionObject(new \Exception('Too many rules'));
-        $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, 1, 2, 'abc');
+        $this->taxRuleService->addLinearTaxRuleToCountry(self::COUNTRY_CODE, 1, 2, 'abc');
     }
 
     public function testCannotAddSquareRuleWhenCountryMaxRules(): void
     {
         $this->aTaxConfigWithLinearRules(10);
         $this->expectExceptionObject(new \Exception('Too many rules'));
-        $this->taxRuleService->addTaxRuleToCountry2(self::COUNTRY_CODE, 1, 1, 1, 'abc');
+        $this->taxRuleService->addSquareTaxRuleToCountry(self::COUNTRY_CODE, 1, 1, 1, 'abc');
     }
 
     public function testCanAddSquareTaxRuleToCountryThatHaveNoRulesYet(): void
     {
-        $this->taxRuleService->addTaxRuleToCountry2(self::COUNTRY_CODE, 5, 6, 7, 'xyz');
+        $this->taxRuleService->addSquareTaxRuleToCountry(self::COUNTRY_CODE, 5, 6, 7, 'xyz');
 
         $this->assertRulesCount(1);
         $rules = $this->getRules();
@@ -110,7 +110,7 @@ final class TaxRuleServiceTest extends TestCase
     {
         $this->aTaxConfigWithLinearRules(1);
 
-        $this->taxRuleService->addTaxRuleToCountry2(self::COUNTRY_CODE, 8, 9, 10, 'ccc');
+        $this->taxRuleService->addSquareTaxRuleToCountry(self::COUNTRY_CODE, 8, 9, 10, 'ccc');
 
         $rules = $this->getRules();
         $this->assertRuleIsSquare(
@@ -152,7 +152,7 @@ final class TaxRuleServiceTest extends TestCase
     private function aTaxConfigWithLinearRules(int $numberOfRules): void
     {
         for ($i = 1; $i <= $numberOfRules; $i++) {
-            $this->taxRuleService->addTaxRuleToCountry(self::COUNTRY_CODE, $i, $i, (string) $i);
+            $this->taxRuleService->addLinearTaxRuleToCountry(self::COUNTRY_CODE, $i, $i, (string) $i);
         }
     }
 

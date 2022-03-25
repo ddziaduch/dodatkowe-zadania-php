@@ -25,22 +25,12 @@ class TaxRuleService
     /**
      * @throws \Exception
      */
-    public function addTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, string $taxCode)
+    public function addLinearTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, string $taxCode)
     {
-        $countryCodeValueObject = new CountryCode($countryCode);
-
-        if ($aFactor == 0) {
-            throw new \Exception("Invalid aFactor");
-        }
-
-        $taxRule = TaxRule::linear($aFactor, $bFactor, $this->year, $taxCode);
-        $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
-
-        if ($taxConfig === null) {
-            $this->createTaxConfigWithRule((string) $countryCodeValueObject, $taxRule);
-        } else {
-            $this->addTaxRuleToConfig($taxConfig, $taxRule);
-        }
+        $this->addTaxRuleToCountry(
+            new CountryCode($countryCode),
+            TaxRule::linear($aFactor, $bFactor, $this->year, $taxCode)
+        );
     }
 
     /**
@@ -48,9 +38,7 @@ class TaxRuleService
      */
     public function createTaxConfigWithRule(string $countryCode, TaxRule $taxRule): TaxConfig
     {
-        $countryCodeValueObject = new CountryCode($countryCode);
-
-        $taxConfig = TaxConfig::withDefaultMaxRuleCount($countryCodeValueObject, $taxRule);
+        $taxConfig = TaxConfig::withDefaultMaxRuleCount(new CountryCode($countryCode), $taxRule);
 
         $this->taxConfigRepository->save($taxConfig);
 
@@ -62,9 +50,7 @@ class TaxRuleService
      */
     public function createTaxConfigWithRuleAndMaxCount(string $countryCode, int $maxRulesCount, TaxRule $taxRule): TaxConfig
     {
-        $countryCodeValueObject = new CountryCode($countryCode);
-
-        $taxConfig = TaxConfig::withCustomMaxRulesCount($countryCodeValueObject, $maxRulesCount, $taxRule);
+        $taxConfig = TaxConfig::withCustomMaxRulesCount(new CountryCode($countryCode), $maxRulesCount, $taxRule);
 
         $this->taxConfigRepository->save($taxConfig);
 
@@ -74,18 +60,12 @@ class TaxRuleService
     /**
      * @throws \Exception
      */
-    public function addTaxRuleToCountry2(string $countryCode, int $aFactor, int $bFactor, int $cFactor, string $taxCode): void
+    public function addSquareTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, int $cFactor, string $taxCode): void
     {
-        $countryCodeValueObject = new CountryCode($countryCode);
-
-        $taxRule = TaxRule::square($aFactor, $bFactor, $cFactor, $this->year, $taxCode);
-        $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
-
-        if ($taxConfig === null) {
-            $this->createTaxConfigWithRule((string) $countryCodeValueObject, $taxRule);
-        } else {
-            $this->addTaxRuleToConfig($taxConfig, $taxRule);
-        }
+        $this->addTaxRuleToCountry(
+            new CountryCode($countryCode),
+            TaxRule::square($aFactor, $bFactor, $cFactor, $this->year, $taxCode)
+        );
     }
 
     /**
@@ -123,10 +103,18 @@ class TaxRuleService
         return $this->taxConfigRepository->findAll();
     }
 
-    private function addTaxRuleToConfig(TaxConfig $taxConfig, TaxRule $taxRule)
+    /**
+     * @throws \Exception
+     */
+    private function addTaxRuleToCountry(CountryCode $countryCode, TaxRule $taxRule): void
     {
-        $taxConfig->addRule($taxRule);
+        $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCode);
 
-        $this->taxConfigRepository->save($taxConfig);
+        if ($taxConfig === null) {
+            $this->createTaxConfigWithRule((string) $countryCode, $taxRule);
+        } else {
+            $taxConfig->addRule($taxRule);
+            $this->taxConfigRepository->save($taxConfig);
+        }
     }
 }

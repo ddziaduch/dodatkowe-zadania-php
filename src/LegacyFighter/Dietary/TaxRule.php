@@ -55,12 +55,19 @@ class TaxRule
         $this->taxCode = "A. 899. " . $year . $taxCode;
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function linear(
         int $aFactor,
         int $bFactor,
         int $year,
         string $taxCode
     ): self {
+        if ($aFactor == 0) {
+            throw new \Exception("Invalid aFactor");
+        }
+
         $self = new self($year, $taxCode);
 
         $self->isLinear = true;

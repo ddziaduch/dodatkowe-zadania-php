@@ -2,8 +2,6 @@
 
 namespace LegacyFighter\Dietary;
 
-use Munus\Collection\GenericList;
-
 class TaxRuleService
 {
     /**
@@ -79,11 +77,16 @@ class TaxRuleService
     }
 
     /**
-     * @return GenericList<TaxRule>
+     * @return array<TaxRuleDto>
      */
-    public function findRules(string $countryCode): GenericList
+    public function findRules(string $countryCode): array
     {
-        return $this->taxConfigRepository->findByCountryCode(new CountryCode($countryCode))->getTaxRules();
+        return array_map(
+            function (TaxRule $rule) {
+                return TaxRuleDto::fromArray($rule->toArray());
+            },
+            $this->taxConfigRepository->findByCountryCode(new CountryCode($countryCode))->getTaxRules()->toArray()
+        );
     }
 
     /**

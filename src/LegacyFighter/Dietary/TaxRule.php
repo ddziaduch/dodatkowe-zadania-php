@@ -186,4 +186,19 @@ class TaxRule
     {
         return $this->id;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'taxCode' => $this->taxCode,
+            'isLinear' => $this->isLinear,
+            'aFactor' => $this->aFactor,
+            'bFactor' => $this->bFactor,
+            'isSquare' => $this->isSquare,
+            'aSquareFactor' => $this->aSquareFactor,
+            'bSquareFactor' => $this->bSquareFactor,
+            'cSquareFactor' => $this->cSquareFactor,
+        ];
+    }
 }

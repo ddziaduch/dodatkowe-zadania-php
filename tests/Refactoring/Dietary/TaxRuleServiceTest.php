@@ -7,6 +7,7 @@ namespace LegacyFighter\Dietary\Tests;
 use LegacyFighter\Dietary\Repository\InMemoryTaxConfigRepository;
 use LegacyFighter\Dietary\TaxConfigDto;
 use LegacyFighter\Dietary\TaxRule;
+use LegacyFighter\Dietary\TaxRuleDto;
 use LegacyFighter\Dietary\TaxRuleService;
 use PHPUnit\Framework\TestCase;
 
@@ -126,7 +127,7 @@ final class TaxRuleServiceTest extends TestCase
 
         $rule = $this->getLastRule();
         $taxConfig = $this->getTaxConfig();
-        $this->taxRuleService->deleteRule($rule->getId(), $taxConfig->id);
+        $this->taxRuleService->deleteRule($rule->id, $taxConfig->id);
         self::assertCount(1, $this->getRules());
     }
 
@@ -137,7 +138,7 @@ final class TaxRuleServiceTest extends TestCase
         $rule = $this->getLastRule();
         $taxConfig = $this->getTaxConfig();
         $this->expectExceptionObject(new \Exception('Last rule in country config'));
-        $this->taxRuleService->deleteRule($rule->getId(), $taxConfig->id);
+        $this->taxRuleService->deleteRule($rule->id, $taxConfig->id);
     }
 
     protected function setUp(): void
@@ -163,27 +164,27 @@ final class TaxRuleServiceTest extends TestCase
         int $factorA,
         int $factorB,
         string $taxCode,
-        TaxRule $rule
+        TaxRuleDto $rule
     ): void {
-        self::assertTrue($rule->isLinear());
-        self::assertSame($factorA, $rule->getaFactor());
-        self::assertSame($factorB, $rule->getbFactor());
-        self::assertSame($taxCode, $rule->getTaxCode());
+        self::assertTrue($rule->isLinear);
+        self::assertSame($factorA, $rule->aFactor);
+        self::assertSame($factorB, $rule->bFactor);
+        self::assertSame($taxCode, $rule->taxCode);
     }
 
     /**
-     * @return TaxRule[]
+     * @return TaxRuleDto[]
      */
     private function getRules(): array
     {
-        return $this->taxRuleService->findRules(self::COUNTRY_CODE)->toArray();
+        return $this->taxRuleService->findRules(self::COUNTRY_CODE);
     }
 
-    private function getLastRule(): TaxRule
+    private function getLastRule(): TaxRuleDto
     {
         $rules = $this->getRules();
         $rule = end($rules);
-        assert($rule instanceof TaxRule);
+        assert($rule instanceof TaxRuleDto);
 
         return $rule;
     }
@@ -193,13 +194,13 @@ final class TaxRuleServiceTest extends TestCase
         int $expectedFactorB,
         int $expectedFactorC,
         string $expectedTaxCode,
-        TaxRule $rule
+        TaxRuleDto $rule
     ): void {
-        self::assertTrue($rule->isSquare());
-        self::assertSame($expectedFactorA, $rule->getaSquareFactor());
-        self::assertSame($expectedFactorB, $rule->getbSquareFactor());
-        self::assertSame($expectedFactorC, $rule->getcSquareFactor());
-        self::assertSame($expectedTaxCode, $rule->getTaxCode());
+        self::assertTrue($rule->isSquare);
+        self::assertSame($expectedFactorA, $rule->aSquareFactor);
+        self::assertSame($expectedFactorB, $rule->bSquareFactor);
+        self::assertSame($expectedFactorC, $rule->cSquareFactor);
+        self::assertSame($expectedTaxCode, $rule->taxCode);
     }
 
     private function getTaxConfig(): TaxConfigDto

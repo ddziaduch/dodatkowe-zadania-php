@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace LegacyFighter\Dietary\Tests;
 
+use LegacyFighter\Dietary\LinearTaxRule;
 use LegacyFighter\Dietary\Repository\InMemoryTaxConfigRepository;
 use LegacyFighter\Dietary\TaxConfigDto;
-use LegacyFighter\Dietary\TaxRule;
 use LegacyFighter\Dietary\TaxRuleDto;
 use LegacyFighter\Dietary\TaxRuleService;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +22,7 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCanCreateTaxConfigWithRule(): void
     {
-        $taxRule = TaxRule::linear(1, 1, 2022, 'abc');
+        $taxRule = new LinearTaxRule(1, 1, 2022, 'abc');
         $dto = $this->taxRuleService->createTaxConfigWithRule(self::COUNTRY_CODE, $taxRule);
         self::assertSame(self::COUNTRY_CODE, $dto->countryCode);
         $rules = $dto->taxRules;
@@ -32,7 +32,7 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCanCreateTaxConfigWithRuleAndCustomMaxRuleCount(): void
     {
-        $taxRule = TaxRule::linear(1, 1, 2022, 'abc');
+        $taxRule = new LinearTaxRule(1, 1, 2022, 'abc');
         $dto = $this->taxRuleService->createTaxConfigWithRuleAndMaxCount(self::COUNTRY_CODE, 15, $taxRule);
         self::assertSame(self::COUNTRY_CODE, $dto->countryCode);
         $rules = $dto->taxRules;

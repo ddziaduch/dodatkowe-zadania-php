@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LegacyFighter\Dietary;
 
 class TaxRuleService
@@ -27,7 +29,18 @@ class TaxRuleService
     {
         $this->addTaxRuleToCountry(
             new CountryCode($countryCode),
-            TaxRule::linear($aFactor, $bFactor, $this->year, $taxCode)
+            new LinearTaxRule($aFactor, $bFactor, $this->year, $taxCode)
+        );
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function addSquareTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, int $cFactor, string $taxCode): void
+    {
+        $this->addTaxRuleToCountry(
+            new CountryCode($countryCode),
+            new SquareTaxRule($aFactor, $bFactor, $cFactor, $this->year, $taxCode)
         );
     }
 
@@ -52,17 +65,6 @@ class TaxRuleService
         $this->taxConfigRepository->save($config);
 
         return TaxConfigDto::fromArray($config->toArray());
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function addSquareTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, int $cFactor, string $taxCode): void
-    {
-        $this->addTaxRuleToCountry(
-            new CountryCode($countryCode),
-            TaxRule::square($aFactor, $bFactor, $cFactor, $this->year, $taxCode)
-        );
     }
 
     /**

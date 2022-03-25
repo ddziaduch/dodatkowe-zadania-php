@@ -95,7 +95,7 @@ final class TaxRuleServiceTest extends TestCase
     {
         $this->taxRuleService->addTaxRuleToCountry2(self::COUNTRY_CODE, 5, 6, 7, 'xyz');
 
-        $this->assertRulesCount(2);
+        $this->assertRulesCount(1);
         $rules = $this->getRules();
         $this->assertRuleIsSquare(
             5,
@@ -103,14 +103,6 @@ final class TaxRuleServiceTest extends TestCase
             7,
             'A. 899. 2022xyz',
             $rules[0]
-        );
-        // wtf, this is definitely a bug!
-        $this->assertRuleIsSquare(
-            5,
-            6,
-            7,
-            'A. 899. 2022xyz',
-            $rules[1]
         );
     }
 
@@ -154,7 +146,7 @@ final class TaxRuleServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->taxRuleService = new TaxRuleService(new InMemoryTaxConfigRepository());
+        $this->taxRuleService = new TaxRuleService(new InMemoryTaxConfigRepository(), 2022);
     }
 
     private function aTaxConfigWithLinearRules(int $numberOfRules): void

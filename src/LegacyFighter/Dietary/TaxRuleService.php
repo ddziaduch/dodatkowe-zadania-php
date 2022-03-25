@@ -33,15 +33,11 @@ class TaxRuleService
         $taxRule = TaxRule::linear($aFactor, $bFactor, $year, $taxCode);
         $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
 
-        if ($taxConfig == null) {
+        if ($taxConfig === null) {
             $this->createTaxConfigWithRule((string) $countryCodeValueObject, $taxRule);
-
-            return;
+        } else {
+            $this->addTaxRuleToConfig($taxConfig, $taxRule);
         }
-
-        $taxConfig->addRule($taxRule);
-
-        $this->taxConfigRepository->save($taxConfig);
     }
 
     /**
@@ -84,13 +80,11 @@ class TaxRuleService
         $taxRule = TaxRule::square($aFactor, $bFactor, $cFactor, $year, $taxCode);
         $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
 
-        if ($taxConfig == null) {
-            $taxConfig = $this->createTaxConfigWithRule((string) $countryCodeValueObject, $taxRule);
+        if ($taxConfig === null) {
+            $this->createTaxConfigWithRule((string) $countryCodeValueObject, $taxRule);
+        } else {
+            $this->addTaxRuleToConfig($taxConfig, $taxRule);
         }
-
-        $taxConfig->addRule($taxRule);
-
-        $this->taxConfigRepository->save($taxConfig);
     }
 
     /**
@@ -130,5 +124,12 @@ class TaxRuleService
     public function findAllConfigs(): array
     {
         return $this->taxConfigRepository->findAll();
+    }
+
+    private function addTaxRuleToConfig(TaxConfig $taxConfig, TaxRule $taxRule)
+    {
+        $taxConfig->addRule($taxRule);
+
+        $this->taxConfigRepository->save($taxConfig);
     }
 }

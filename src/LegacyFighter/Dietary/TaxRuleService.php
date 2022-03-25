@@ -12,13 +12,19 @@ class TaxRuleService
     private $taxConfigRepository;
 
     /**
+     * @var int
+     */
+    private $year;
+
+    /**
      * TaxRuleService constructor.
      *
      * @param TaxConfigRepository $taxConfigRepository
      */
-    public function __construct(TaxConfigRepository $taxConfigRepository)
+    public function __construct(TaxConfigRepository $taxConfigRepository, int $year)
     {
         $this->taxConfigRepository = $taxConfigRepository;
+        $this->year = $year;
     }
 
     public function addTaxRuleToCountry(string $countryCode, int $aFactor, int $bFactor, string $taxCode)
@@ -29,8 +35,7 @@ class TaxRuleService
             throw new \Exception("Invalid aFactor");
         }
 
-        $year = (int)date('Y');
-        $taxRule = TaxRule::linear($aFactor, $bFactor, $year, $taxCode);
+        $taxRule = TaxRule::linear($aFactor, $bFactor, $this->year, $taxCode);
         $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
 
         if ($taxConfig === null) {
@@ -76,8 +81,7 @@ class TaxRuleService
             throw new \Exception("Invalid aFactor");
         }
 
-        $year = (int)date('Y');
-        $taxRule = TaxRule::square($aFactor, $bFactor, $cFactor, $year, $taxCode);
+        $taxRule = TaxRule::square($aFactor, $bFactor, $cFactor, $this->year, $taxCode);
         $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
 
         if ($taxConfig === null) {

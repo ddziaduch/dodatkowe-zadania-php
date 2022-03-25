@@ -29,13 +29,8 @@ class TaxRuleService
             throw new \Exception("Invalid aFactor");
         }
 
-        $taxRule = new TaxRule();
-
-        $taxRule->setaFactor($aFactor);
-        $taxRule->setbFactor($bFactor);
-        $taxRule->setLinear(true);
         $year = (int)date('Y');
-        $taxRule->setTaxCode("A. 899. " . $year . $taxCode);
+        $taxRule = TaxRule::linear($aFactor, $bFactor, $year, $taxCode);
         $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
 
         if ($taxConfig == null) {
@@ -85,14 +80,8 @@ class TaxRuleService
             throw new \Exception("Invalid aFactor");
         }
 
-        $taxRule = new TaxRule();
-        $taxRule->setaSquareFactor($aFactor);
-        $taxRule->setbSquareFactor($bFactor);
-        $taxRule->setcSquareFactor($cFactor);
-        $taxRule->setSquare(true);
         $year = (int)date('Y');
-        $taxRule->setTaxCode("A. 899. " . $year . $taxCode);
-
+        $taxRule = TaxRule::square($aFactor, $bFactor, $cFactor, $year, $taxCode);
         $taxConfig = $this->taxConfigRepository->findByCountryCode($countryCodeValueObject);
 
         if ($taxConfig == null) {

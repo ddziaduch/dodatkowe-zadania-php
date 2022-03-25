@@ -49,35 +49,37 @@ class TaxRule
      */
     private $cSquareFactor;
 
-    /**
-     * @var TaxConfig
-     */
-    private $taxConfig;
-
-    /**
-     * TaxRule constructor.
-     */
-    public function __construct()
+    private function __construct(int $year, string $taxCode)
     {
         $this->id = random_int(0, PHP_INT_MAX); // SHORTCUT
+        $this->taxCode = "A. 899. " . $year . $taxCode;
     }
 
-    /**
-     * @param int $a
-     * @param int $b
-     * @param string $taxCode
-     */
-    public static function linearRule(int $a, int $b, string $taxCode)
+    public static function linear(
+        int $aFactor,
+        int $bFactor,
+        int $year,
+        string $taxCode
+    ): self {
+        $self = new self($year, $taxCode);
+
+        $self->isLinear = true;
+        $self->aFactor = $aFactor;
+        $self->bFactor = $bFactor;
+
+        return $self;
+    }
+
+    public static function square(int $aFactor, int $bFactor, int $cFactor, int $year, string $taxCode): self
     {
-        $rule = new TaxRule();
+        $self = new self($year, $taxCode);
 
-        $rule->setLinear(true);
-        $rule->setTaxCode($taxCode);
-        $rule->setaFactor($a);
-        $rule->setbSquareFactor($b);
-        $rule->setTaxCode($taxCode);
+        $self->aSquareFactor = $aFactor;
+        $self->bSquareFactor = $bFactor;
+        $self->cSquareFactor = $cFactor;
+        $self->isSquare = true;
 
-        return $rule;
+        return $self;
     }
 
     /**
@@ -89,27 +91,11 @@ class TaxRule
     }
 
     /**
-     * @param bool $isLinear
-     */
-    public function setLinear(bool $isLinear): void
-    {
-        $this->isLinear = $isLinear;
-    }
-
-    /**
      * @return string
      */
     public function getTaxCode(): string
     {
         return $this->taxCode;
-    }
-
-    /**
-     * @param string $taxCode
-     */
-    public function setTaxCode(string $taxCode): void
-    {
-        $this->taxCode = $taxCode;
     }
 
     /**
@@ -121,27 +107,11 @@ class TaxRule
     }
 
     /**
-     * @param int $aFactor
-     */
-    public function setaFactor(int $aFactor): void
-    {
-        $this->aFactor = $aFactor;
-    }
-
-    /**
      * @return int
      */
     public function getbFactor(): int
     {
         return $this->bFactor;
-    }
-
-    /**
-     * @param int $bFactor
-     */
-    public function setbFactor(int $bFactor): void
-    {
-        $this->bFactor = $bFactor;
     }
 
     /**
@@ -153,27 +123,11 @@ class TaxRule
     }
 
     /**
-     * @param bool $isSquare
-     */
-    public function setSquare(bool $isSquare): void
-    {
-        $this->isSquare = $isSquare;
-    }
-
-    /**
      * @return int
      */
     public function getaSquareFactor(): int
     {
         return $this->aSquareFactor;
-    }
-
-    /**
-     * @param int $aSquareFactor
-     */
-    public function setaSquareFactor(int $aSquareFactor): void
-    {
-        $this->aSquareFactor = $aSquareFactor;
     }
 
     /**
@@ -185,27 +139,11 @@ class TaxRule
     }
 
     /**
-     * @param int $bSquareFactor
-     */
-    public function setbSquareFactor(int $bSquareFactor): void
-    {
-        $this->bSquareFactor = $bSquareFactor;
-    }
-
-    /**
      * @return int
      */
     public function getcSquareFactor(): int
     {
         return $this->cSquareFactor;
-    }
-
-    /**
-     * @param int $cSquareFactor
-     */
-    public function setcSquareFactor(int $cSquareFactor): void
-    {
-        $this->cSquareFactor = $cSquareFactor;
     }
 
     /**

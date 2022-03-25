@@ -21,7 +21,7 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCanCreateTaxConfigWithRule(): void
     {
-        $taxRule = new TaxRule();
+        $taxRule = TaxRule::linear(1, 1, 2022, 'abc');
         $taxConfig = $this->taxRuleService->createTaxConfigWithRule(self::COUNTRY_CODE, $taxRule);
         self::assertSame(self::COUNTRY_CODE, $taxConfig->getCountryCode());
         $rules = $taxConfig->getTaxRules()->toArray();
@@ -32,7 +32,7 @@ final class TaxRuleServiceTest extends TestCase
 
     public function testCanCreateTaxConfigWithRuleAndCustomMaxRuleCount(): void
     {
-        $taxRule = new TaxRule();
+        $taxRule = TaxRule::linear(1, 1, 2022, 'abc');
         $taxConfig = $this->taxRuleService->createTaxConfigWithRuleAndMaxCount(self::COUNTRY_CODE, 15, $taxRule);
         self::assertSame(self::COUNTRY_CODE, $taxConfig->getCountryCode());
         $rules = $taxConfig->getTaxRules()->toArray();

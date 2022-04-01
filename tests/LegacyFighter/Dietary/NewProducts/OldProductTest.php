@@ -3,13 +3,13 @@
 namespace Tests\LegacyFighter\Dietary\NewProducts;
 
 use Brick\Math\BigDecimal;
+use LegacyFighter\Dietary\NewProducts\Counter;
 use PHPUnit\Framework\TestCase;
 use LegacyFighter\Dietary\NewProducts\OldProduct;
 use LegacyFighter\Dietary\NewProducts\Price;
 
 class OldProductTest extends TestCase
 {
-
     /**
      * @test
      */
@@ -18,6 +18,37 @@ class OldProductTest extends TestCase
         $this->expectException(\Exception::class);
 
         Price::of(null);
+    }
+
+    /** @test */
+    public function priceCannotBeNegative(): void
+    {
+        $this->expectException(\Exception::class);
+
+        $this->productWithPriceAndCounter(BigDecimal::of(-100), 0);
+    }
+
+    /** @test */
+    public function counterCannotBeNegative(): void
+    {
+        $this->expectException(\Exception::class);
+
+        // todo: fix this
+        $this->productWithPriceAndCounter(BigDecimal::one(), -100);
+    }
+
+    /** @test */
+    public function descriptionCannotBeEmpty(): void
+    {
+        $this->expectException(\Exception::class);
+        new OldProduct(BigDecimal::one(), null, 'long desc', 1);
+    }
+
+    /** @test */
+    public function longDescriptionCannotBeEmpty(): void
+    {
+        $this->expectException(\Exception::class);
+        new OldProduct(BigDecimal::one(), 'desc', null, 1);
     }
 
     /**
@@ -48,6 +79,53 @@ class OldProductTest extends TestCase
 
         //then
         $this->assertEquals(BigDecimal::zero(), $p->getPrice());
+    }
+
+    /** @test */
+    public function canDecreaseCounter(): void
+    {
+        $p = $this->productWithPriceAndCounter(BigDecimal::one(), 100);
+
+        $p->decrementCounter();
+
+        $this->assertSame(99, $p->getCounter());
+    }
+
+    /** @test */
+    public function cannotDecreaseCounterWhenPriceIsZero(): void
+    {
+        $p = $this->productWithPriceAndCounter(BigDecimal::zero(), 100);
+
+        $this->expectException(\Exception::class);
+        $p->decrementCounter();
+    }
+
+    /** @test */
+    public function cannotDecreaseCounterWhenCounterIsLessThanOne(): void
+    {
+        $p = $this->productWithPriceAndCounter(BigDecimal::one(), 0);
+
+        $this->expectException(\Exception::class);
+        // todo: fix this
+        $p->decrementCounter();
+    }
+
+    /** @test */
+    public function canIncrementCounter(): void
+    {
+        $p = $this->productWithPriceAndCounter(BigDecimal::one(), 0);
+
+        $p->incrementCounter();
+
+        self::assertSame(1, $p->getCounter());
+    }
+
+    /** @test */
+    public function cannotIncrementCounterWhenPriceIsZero(): void
+    {
+        $p = $this->productWithPriceAndCounter(BigDecimal::zero(), 0);
+        $this->expectException(\Exception::class);
+        $p->incrementCounter();
     }
 
     /**

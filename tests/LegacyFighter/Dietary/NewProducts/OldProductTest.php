@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\LegacyFighter\Dietary\NewProducts;
 
 use Brick\Math\BigDecimal;
-use LegacyFighter\Dietary\NewProducts\Counter;
 use PHPUnit\Framework\TestCase;
 use LegacyFighter\Dietary\NewProducts\OldProduct;
 use LegacyFighter\Dietary\NewProducts\Price;

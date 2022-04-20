@@ -41,14 +41,14 @@ class OldProductTest extends TestCase
     /** @test */
     public function descriptionCannotBeEmpty(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(\TypeError::class);
         new OldProduct(BigDecimal::one(), null, 'long desc', 1);
     }
 
     /** @test */
     public function longDescriptionCannotBeEmpty(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(\TypeError::class);
         new OldProduct(BigDecimal::one(), 'desc', null, 1);
     }
 

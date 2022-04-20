@@ -56,7 +56,7 @@ class OldProduct
     {
         $this->serialNumber = Uuid::uuid4();
         $this->price = Price::of($price);
-        $this->desc = new OldProductDescription($desc, $longDesc);
+        $this->desc = new OldProductDescription($this->serialNumber, $desc, $longDesc);
         $this->counter = new Counter($counter);
     }
 

@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace LegacyFighter\Dietary\NewProducts;
 
+use Ramsey\Uuid\UuidInterface;
+
 class OldProductDescription
 {
+    /**
+     * @var UuidInterface
+     */
+    private $serialNumber;
+
     /**
      * @var string
      */
@@ -16,8 +23,9 @@ class OldProductDescription
      */
     private $longDesc;
 
-    public function __construct(string $desc, string $longDesc)
+    public function __construct(UuidInterface $serialNumber, string $desc, string $longDesc)
     {
+        $this->serialNumber = $serialNumber;
         $this->desc = $desc;
         $this->longDesc = $longDesc;
     }
@@ -34,8 +42,17 @@ class OldProductDescription
     public function replace(string $charToReplace, string $replaceWith): OldProductDescription
     {
         return new OldProductDescription(
+            $this->serialNumber,
             str_replace($charToReplace, $replaceWith, $this->desc),
             str_replace($charToReplace, $replaceWith, $this->longDesc)
         );
+    }
+
+    /**
+     * @return UuidInterface
+     */
+    public function serialNumber(): UuidInterface
+    {
+        return $this->serialNumber;
     }
 }

@@ -6,6 +6,7 @@ namespace Tests\LegacyFighter\Dietary\NewProducts;
 
 use LegacyFighter\Dietary\NewProducts\OldProductDescription;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 
 class OldProductDescriptionTest extends TestCase
 {
@@ -13,14 +14,14 @@ class OldProductDescriptionTest extends TestCase
     public function descriptionCannotBeEmpty(): void
     {
         $this->expectException(\TypeError::class);
-        new OldProductDescription(null, 'long desc');
+        $this->oldProductDescription(null, 'long desc');
     }
 
     /** @test */
     public function longDescriptionCannotBeEmpty(): void
     {
         $this->expectException(\TypeError::class);
-        new OldProductDescription('desc', null);
+        $this->oldProductDescription('desc', null);
     }
 
     /**
@@ -49,9 +50,9 @@ class OldProductDescriptionTest extends TestCase
         $this->assertEquals("zhort *** long", $p->formatted());
     }
 
-    private function oldProductDescription(string $desc, string $longDesc): OldProductDescription
+    private function oldProductDescription(?string $desc, ?string $longDesc): OldProductDescription
     {
-        return new OldProductDescription($desc, $longDesc);
+        return new OldProductDescription(Uuid::uuid4(), $desc, $longDesc);
     }
 
 

@@ -6,6 +6,23 @@ use Brick\Math\BigDecimal;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
+/**
+ * odpowiedzialności:
+ * - cena nie może być pusta [null]
+ * - cena nie może być ujemna
+ * - licznik musi być nie ujemny
+ * - opis i długi opis nie moga być puste [null]
+ * - licznik można pomniejszyć tylko gdy cena jest niezerowa i licznik jest większy od zera
+ * - licznik można powiększyć tylko gdy cena jest niezerowa
+ * - cenę można zmienić tylko gdy licznik jest większy niż zero
+ * - można zmienić znak w opisie i długim opisie
+ * - można sformatować opis
+ *
+ * problemy:
+ * - licznik i cena są ze sobą silnie związane
+ * - opis i długi opis można wynieść do osobnego obiektu
+ * - konstruktor ma parametry które mogą być null co nie pozwoli na stworzenie poprawnego obiektu
+ */
 class OldProduct
 {
     /**
@@ -121,24 +138,3 @@ class OldProduct
         return $this->serialNumber;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -2,6 +2,7 @@
 
 namespace LegacyFighter\Dietary\NewProducts\OldProductRepository;
 
+use LegacyFighter\Dietary\NewProducts\OldProductDescriptionRepository;
 use Ramsey\Uuid\UuidInterface;
 use LegacyFighter\Dietary\NewProducts\OldProduct;
 use LegacyFighter\Dietary\NewProducts\OldProductRepository;
@@ -9,21 +10,33 @@ use LegacyFighter\Dietary\NewProducts\OldProductRepository;
 class InMemory implements OldProductRepository
 {
     /**
-     * @var array
+     * @var OldProduct[]
      */
     private $products = [];
 
-    /**
-     * @param UuidInterface $productId
-     * @return OldProduct
-     */
+    /** @var OldProductDescriptionRepository */
+    private $descriptionRepository;
+
+    public function __construct(
+        OldProductDescriptionRepository $descriptionRepository
+    ) {
+        $this->descriptionRepository = $descriptionRepository;
+    }
+
     public function getOne(UuidInterface $productId): ?OldProduct
     {
         if (!array_key_exists($productId->toString(), $this->products)) {
             return null;
         }
 
-        return $this->products[$productId->toString()];
+        $product = $this->products[$productId->toString()];
+        $description = $this->descriptionRepository->getOne($productId);
+
+        if (null === $description) {
+            throw new \RuntimeException('Unable to find description for a product');
+        }
+
+        return $product->withDescription($description->getShort(), $description->getLong());
     }
 
     /**
@@ -32,6 +45,7 @@ class InMemory implements OldProductRepository
     public function save(OldProduct $product): void
     {
         $this->products[$product->serialNumber()->toString()] = $product;
+        $this->descriptionRepository->save($product->getDescription());
     }
 
     /**
@@ -41,5 +55,4 @@ class InMemory implements OldProductRepository
     {
         return array_values($this->products);
     }
-
 }

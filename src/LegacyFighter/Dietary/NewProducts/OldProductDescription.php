@@ -39,13 +39,10 @@ class OldProductDescription
         return $this->desc . " *** " . $this->longDesc;
     }
 
-    public function replace(string $charToReplace, string $replaceWith): OldProductDescription
+    public function replace(string $charToReplace, string $replaceWith): void
     {
-        return new OldProductDescription(
-            $this->serialNumber,
-            str_replace($charToReplace, $replaceWith, $this->desc),
-            str_replace($charToReplace, $replaceWith, $this->longDesc)
-        );
+        $this->desc = str_replace($charToReplace, $replaceWith, $this->desc);
+        $this->longDesc = str_replace($charToReplace, $replaceWith, $this->longDesc);
     }
 
     /**
@@ -54,5 +51,15 @@ class OldProductDescription
     public function serialNumber(): UuidInterface
     {
         return $this->serialNumber;
+    }
+
+    public function getShort(): string
+    {
+        return $this->desc;
+    }
+
+    public function getLong(): string
+    {
+        return $this->longDesc;
     }
 }

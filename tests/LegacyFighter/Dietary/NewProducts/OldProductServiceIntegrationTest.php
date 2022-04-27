@@ -6,22 +6,31 @@ namespace Tests\LegacyFighter\Dietary\NewProducts;
 
 use Brick\Math\BigDecimal;
 use LegacyFighter\Dietary\NewProducts\OldProduct;
+use LegacyFighter\Dietary\NewProducts\OldProductDescriptionRepository;
+use LegacyFighter\Dietary\NewProducts\OldProductDescriptionRepository\InMemory as InMemoryOldProductDescriptionRepository;
 use LegacyFighter\Dietary\NewProducts\OldProductRepository;
-use LegacyFighter\Dietary\NewProducts\OldProductRepository\InMemory;
+use LegacyFighter\Dietary\NewProducts\OldProductRepository\InMemory as InMemoryOldProductRepository;
 use LegacyFighter\Dietary\NewProducts\OldProductService;
 use PHPUnit\Framework\TestCase;
 
 class OldProductServiceIntegrationTest extends TestCase
 {
+    /** @var OldProductDescriptionRepository */
+    private $descriptionRepository;
+
+    /** @var OldProductRepository */
+    private $productRepository;
+
+    /** @var OldProductService */
+    private $service;
+
     /** @test */
     public function canFindAllDescriptions(): void
     {
-        $product1 = $this->aProduct(1);
-        $product2 = $this->aProduct(2);
-        $oldProductRepository = $this->aRepository($product1, $product2);
-        $oldProductService = new OldProductService($oldProductRepository);
+        $this->aProduct(1);
+        $this->aProduct(2);
 
-        $allDescriptions = $oldProductService->findAllDescriptions();
+        $allDescriptions = $this->service->findAllDescriptions();
 
         self::assertSame(
             [
@@ -36,26 +45,22 @@ class OldProductServiceIntegrationTest extends TestCase
     public function canReplaceCharInDesc(): void
     {
         $product = $this->aProduct(1);
-        $repository = $this->aRepository($product);
-        $service = new OldProductService($repository);
 
-        $service->replaceCharInDesc($product->serialNumber(), 'desc', 'ipsum');
+        $this->service->replaceCharInDesc($product->serialNumber(), 'desc', 'ipsum');
 
-        $product = $repository->getOne($product->serialNumber());
+        $description = $this->descriptionRepository->getOne($product->serialNumber());
 
-        self::assertSame('ipsum1 *** long ipsum1', $product->formatDesc());
+        self::assertSame('ipsum1 *** long ipsum1', $description->formatted());
     }
 
     /** @test */
     public function canIncrementCounter(): void
     {
         $product = $this->aProduct(1);
-        $repository = $this->aRepository($product);
-        $service = new OldProductService($repository);
 
-        $service->incrementCounter($product->serialNumber());
+        $this->service->incrementCounter($product->serialNumber());
 
-        $product = $repository->getOne($product->serialNumber());
+        $product = $this->productRepository->getOne($product->serialNumber());
 
         self::assertSame(2, $product->getCounter());
     }
@@ -64,12 +69,10 @@ class OldProductServiceIntegrationTest extends TestCase
     public function canChangePriceOf(): void
     {
         $product = $this->aProduct(1);
-        $repository = $this->aRepository($product);
-        $service = new OldProductService($repository);
 
-        $service->changePriceOf($product->serialNumber(), BigDecimal::of(100));
+        $this->service->changePriceOf($product->serialNumber(), BigDecimal::of(100));
 
-        $product = $repository->getOne($product->serialNumber());
+        $product = $this->productRepository->getOne($product->serialNumber());
 
         self::assertSame(100, $product->getPrice()->toInt());
     }
@@ -78,10 +81,8 @@ class OldProductServiceIntegrationTest extends TestCase
     public function canReturnCounterOf(): void
     {
         $product = $this->aProduct(1);
-        $repository = $this->aRepository($product);
-        $service = new OldProductService($repository);
 
-        $counter = $service->getCounterOf($product->serialNumber());
+        $counter = $this->service->getCounterOf($product->serialNumber());
 
         self::assertSame($product->getCounter(), $counter);
     }
@@ -90,32 +91,32 @@ class OldProductServiceIntegrationTest extends TestCase
     public function canReturnPriceOf(): void
     {
         $product = $this->aProduct(1);
-        $repository = $this->aRepository($product);
-        $service = new OldProductService($repository);
 
-        $price = $service->getPriceOf($product->serialNumber());
+        $price = $this->service->getPriceOf($product->serialNumber());
 
         self::assertSame(1, $price->toInt());
     }
 
     private function aProduct(int $number): OldProduct
     {
-        return new OldProduct(
+        $product = new OldProduct(
             BigDecimal::of($number),
-            'desc'.$number,
-            'long desc'.$number,
+            'desc' . $number,
+            'long desc' . $number,
             $number
         );
+
+        $this->productRepository->save($product);
+
+        return $product;
     }
 
-    private function aRepository(OldProduct ...$products): OldProductRepository
+    protected function setUp(): void
     {
-        $oldProductRepository = new InMemory();
+        parent::setUp();
 
-        foreach ($products as $product) {
-            $oldProductRepository->save($product);
-        }
-
-        return $oldProductRepository;
+        $this->descriptionRepository = new InMemoryOldProductDescriptionRepository();
+        $this->productRepository = new InMemoryOldProductRepository($this->descriptionRepository);
+        $this->service = new OldProductService($this->productRepository, $this->descriptionRepository);
     }
 }

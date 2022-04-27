@@ -15,12 +15,20 @@ class OldProductService
     private $oldProductRepository;
 
     /**
+     * @var OldProductDescriptionRepository
+     */
+    private $oldProductDescriptionRepository;
+
+    /**
      * OldProductService constructor.
      * @param OldProductRepository $oldProductRepository
      */
-    public function __construct(OldProductRepository $oldProductRepository)
-    {
+    public function __construct(
+        OldProductRepository $oldProductRepository,
+        OldProductDescriptionRepository $oldProductDescriptionRepository
+    ) {
         $this->oldProductRepository = $oldProductRepository;
+        $this->oldProductDescriptionRepository = $oldProductDescriptionRepository;
     }
 
     /**
@@ -28,9 +36,9 @@ class OldProductService
      */
     public function findAllDescriptions(): array
     {
-        return (new MemoryStream($this->oldProductRepository->findAll()))
-            ->map(function(OldProduct  $product) {
-                return $product->formatDesc();
+        return (new MemoryStream($this->oldProductDescriptionRepository->findAll()))
+            ->map(function(OldProductDescription  $product) {
+                return $product->formatted();
             })
             ->collect(new ArrayCollector());
     }
@@ -43,11 +51,11 @@ class OldProductService
      * @throws \Exception
      */
     public function replaceCharInDesc(UuidInterface $productId, string $oldChar, string $newChar) {
-        $product = $this->oldProductRepository->getOne($productId);
+        $description = $this->oldProductDescriptionRepository->getOne($productId);
 
-        $product->replaceCharFromDesc($oldChar, $newChar);
+        $description->replace($oldChar, $newChar);
 
-        $this->oldProductRepository->save($product);
+        $this->oldProductDescriptionRepository->save($description);
     }
 
     /**

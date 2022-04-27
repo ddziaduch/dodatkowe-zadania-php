@@ -44,7 +44,7 @@ class OldProductDescriptionTest extends TestCase
         $p = $this->oldProductDescription("short", "long");
 
         //when
-        $p = $p->replace('s', 'z');
+        $p->replace('s', 'z');
 
         //expect
         $this->assertEquals("zhort *** long", $p->formatted());

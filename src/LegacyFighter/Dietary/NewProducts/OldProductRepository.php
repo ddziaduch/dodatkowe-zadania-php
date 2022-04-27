@@ -10,5 +10,8 @@ interface OldProductRepository
 
     public function save(OldProduct $product): void;
 
-    function findAll(): array;
+    /**
+     * @return OldProduct[]
+     */
+    public function findAll(): array;
 }
